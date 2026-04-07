@@ -1,8 +1,63 @@
 # DriftXplain-IDS
 
-## Setup
+An Intrusion Detection System (IDS) for CICIDS2017 with:
 
-1. Create and activate Python 3.12 virtual environment.
+- End-to-end preprocessing and drift-aware splitting
+- Feature selection and model comparison
+- Final Random Forest inference pipeline
+- SHAP local and summary explainability in Streamlit
+
+## What Is In This Repository
+
+This project has two major notebook phases and one deployable app:
+
+1. Preprocessing notebook:
+	- Data loading from CICIDS2017 CSV files
+	- Label cleanup (including Web Attack naming fixes)
+	- Numeric cleaning (inf/NaN handling)
+	- Outlier clipping (IQR)
+	- Main vs drift split (Mon-Wed for train/val/test, Thu-Fri for drift)
+	- MinMax scaling and split export
+
+2. Model comparison and final training notebook:
+	- Correlation-based top-20 feature selection
+	- Multiple model baselines (LR, RF, XGB)
+	- Imbalance handling experiments (SMOTE, class-weighted)
+	- Final model artifact saving (rf_final.pkl, scaler.pkl, features.pkl)
+	- SHAP analysis (summary, bar, waterfall, dependence)
+
+3. Streamlit app:
+	- Interactive inference with threshold tuning
+	- One-click demo presets from tests/demo_inputs.csv
+	- SHAP waterfall + top positive/negative contributions
+	- SHAP summary plot for global pattern view
+
+## Project Structure
+
+```text
+DriftXplain-IDS/
+├─ app/
+│  └─ app.py
+├─ models/
+│  ├─ rf_final.pkl
+│  ├─ scaler.pkl
+│  └─ features.pkl
+├─ notebooks/
+│  ├─ IDS-Preprocessing.ipynb
+│  └─ IDS-Model comparsions and Final Model Training with SHAP.ipynb
+├─ tests/
+│  ├─ demo_inputs.csv
+│  ├─ generate_demo_inputs.py
+│  └─ run_demo_cases.py
+├─ requirements.txt
+└─ README.md
+```
+
+## Local Setup
+
+Use Python 3.12 so scikit-learn 1.6.1 wheels install cleanly.
+
+1. Create and activate environment:
 
 ```bash
 py -3.12 -m venv venv312
@@ -15,36 +70,58 @@ venv312\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Verify sklearn version is 1.6.1:
+3. Verify critical version:
 
 ```bash
 python -c "import sklearn; print(sklearn.__version__)"
 ```
 
-## Run App
+Expected output: 1.6.1
+
+## Run Streamlit App
 
 ```bash
 streamlit run app/app.py
 ```
 
-## Demo Test Cases
+Inside the app:
 
-Run the scripted demo inputs without manual form entry:
+- Use the sidebar threshold slider (default 0.40)
+- Load one-click demo presets
+- Click Predict to view probability and SHAP explanations
+
+## Terminal Testing (No Manual UI Entry)
+
+Run scripted demo predictions:
 
 ```bash
 venv312\Scripts\python.exe tests/run_demo_cases.py
 ```
 
-Refresh demo rows automatically from the trained model:
+Regenerate demo rows from current model:
 
 ```bash
 venv312\Scripts\python.exe tests/generate_demo_inputs.py
 ```
 
-Input rows are stored in tests/demo_inputs.csv.
+## Notebook Usage Notes
 
-## Notes
+The notebooks currently include Google Drive paths (for Colab), for example:
 
-- The app loads model artifacts from the models directory relative to the project root.
-- Threshold is configurable in the sidebar and defaults to 0.40.
-- Prediction explanations are shown with SHAP waterfall plot and top feature contribution tables.
+- /content/drive/MyDrive/ids_project/data/processed/
+- /content/drive/MyDrive/ids_project/models/
+
+If running locally, update these paths to project-relative locations.
+
+Recommended local mapping:
+
+- processed data -> data/processed/
+- models -> models/
+- report outputs -> reports/
+
+## Current Inference Contract
+
+- Model type: RandomForestClassifier
+- Feature count: 20 (must match scaler and feature artifact)
+- Default attack threshold: 0.40
+- Explainability: SHAP waterfall + contribution tables + SHAP summary plot
