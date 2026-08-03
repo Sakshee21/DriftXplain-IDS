@@ -1,5 +1,9 @@
 # DriftXplain-IDS
 
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://driftxplain-ids-hnewqv9ezpn3nbwowkzqiu.streamlit.app/)
+
+**Live demo:** https://driftxplain-ids-hnewqv9ezpn3nbwowkzqiu.streamlit.app/
+
 An Intrusion Detection System (IDS) for CICIDS2017 with:
 
 - End-to-end preprocessing and drift-aware splitting
@@ -79,6 +83,10 @@ python -c "import sklearn; print(sklearn.__version__)"
 Expected output: 1.6.1
 
 ## Run Streamlit App
+
+Hosted version (no setup required): https://driftxplain-ids-hnewqv9ezpn3nbwowkzqiu.streamlit.app/
+
+Or run locally:
 
 ```bash
 streamlit run app/app.py
